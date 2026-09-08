@@ -35,3 +35,13 @@ export interface DMSCoordinate {
     latitude: LatitudeDMS;
     longitude: LongitudeDMS;
 }
+
+/**
+ * A geographic bounding box defined by its northernmost, southernmost, easternmost, and westernmost coordinates.
+ */
+export type Bounds = {
+    north: number;
+    south: number;
+    east: number;
+    west: number;
+};
