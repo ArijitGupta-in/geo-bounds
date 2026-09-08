@@ -1,0 +1,48 @@
+{
+  "name": "@arijitgupta/geo-bounds",
+  "version": "1.0.0",
+  "description": "Calculate the rectangular bounding box in North and South latitudes and East and West longitudes for a given set of geographic coordinates.",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ArijitGupta-in/geo-bounds.git"
+  },
+  "homepage": "https://github.com/ArijitGupta-in/geo-bounds",
+  "bugs": {
+    "url": "https://github.com/ArijitGupta-in/geo-bounds/issues"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "check": "tsc --noEmit",
+    "prepublishOnly": "npm run check && npm test && npm run build"
+  },
+  "keywords": [
+    "geo",
+    "geospatial",
+    "bounds",
+    "bounding-box",
+    "latitude",
+    "longitude",
+    "dms",
+    "geography"
+  ],
+  "author": "Arijit Gupta",
+  "license": "MIT",
+  "devDependencies": {
+    "markdownlint-cli2": "^0.23.2",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.11"
+  }
+}
