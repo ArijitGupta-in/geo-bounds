@@ -1,7 +1,7 @@
 /**
  * @arijitgupta/geo-bounds — public API surface.
  *
- * Exports the {@link distanceBetween} function and both coordinate types:
+ * Exports the {@link getBounds} function, the {@link Bounds} type, and both coordinate types:
  * {@link Coordinate} (decimal degrees) and {@link DMSCoordinate} (DMS format).
  */
 export type {
@@ -11,6 +11,7 @@ export type {
     LongitudeDMS,
     LatitudeDirection,
     LongitudeDirection,
+    Bounds,
 } from "./types.js";
-// export { distanceBetween } from "./distanceBetween.js";
+export { getBounds } from "./getBounds.js";
 export { validateCoordinate, dmsToDecimal } from "./coordinate.js";
