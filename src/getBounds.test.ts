@@ -60,10 +60,6 @@ describe("getBounds", () => {
         });
     });
 
-    it("throws when given no coordinates", () => {
-        expect(() => getBounds([])).toThrow();
-    });
-
     it("accepts DMS coordinates", () => {
         const coordinates = [
             {
@@ -87,6 +83,41 @@ describe("getBounds", () => {
             south: 22.5726,
             east: 88.3639,
             west: 88.3639,
+        });
+    });
+
+    it("returns bounds for multiple coordinates", () => {
+        const coordinates = [
+            { latitude: 22.5726, longitude: 88.3639 },
+            { latitude: 22.595, longitude: 88.4 },
+            { latitude: 22.55, longitude: 88.34 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 22.595,
+            south: 22.55,
+            east: 88.4,
+            west: 88.34,
+        });
+    });
+
+    it("throws when given no coordinates", () => {
+        expect(() => getBounds([])).toThrow(
+            "At least one coordinate is required"
+        );
+    });
+
+    it("uses a non-wrapping bound when longitude span is exactly 180 degrees", () => {
+        const coordinates = [
+            { latitude: 0, longitude: 0 },
+            { latitude: 0, longitude: 180 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 0,
+            south: 0,
+            east: 180,
+            west: 0,
         });
     });
 });

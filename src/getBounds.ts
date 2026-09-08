@@ -22,8 +22,8 @@ function normalize(coord: Coordinate | DMSCoordinate): Coordinate {
  * Longitude is treated as a circular value, allowing the resulting bounds
  * to cross the antimeridian.
  *
- * @throws {RangeError} If any coordinate is invalid.
  * @throws {Error} If no coordinates are provided.
+ * @throws {RangeError} If any coordinate is invalid.
  */
 export function getBounds(coordinates: (Coordinate | DMSCoordinate)[]): Bounds {
     if (coordinates.length === 0) {
@@ -32,8 +32,14 @@ export function getBounds(coordinates: (Coordinate | DMSCoordinate)[]): Bounds {
 
     const normalized = coordinates.map(normalize);
 
-    let south = normalized[0].latitude;
-    let north = normalized[0].latitude;
+    const firstCoordinate = normalized[0];
+
+    if (firstCoordinate === undefined) {
+        throw new Error("At least one coordinate is required");
+    }
+
+    let south = firstCoordinate.latitude;
+    let north = firstCoordinate.latitude;
 
     const longitudes: number[] = [];
 
@@ -45,25 +51,52 @@ export function getBounds(coordinates: (Coordinate | DMSCoordinate)[]): Bounds {
 
     longitudes.sort((a, b) => a - b);
 
-    let largestGap = longitudes[0] + 360 - longitudes[longitudes.length - 1];
+    const firstLongitude = longitudes[0];
+    const lastLongitude = longitudes[longitudes.length - 1];
+
+    if (firstLongitude === undefined || lastLongitude === undefined) {
+        throw new Error("At least one coordinate is required");
+    }
+
+    // Start with the gap that wraps from the largest longitude
+    // back around to the smallest longitude.
+    let largestGap = firstLongitude + 360 - lastLongitude;
     let largestGapIndex = longitudes.length - 1;
 
+    // Find the largest gap between adjacent longitudes.
     for (let i = 0; i < longitudes.length - 1; i++) {
-        const gap = longitudes[i + 1] - longitudes[i];
+        const current = longitudes[i];
+        const next = longitudes[i + 1];
 
+        if (current === undefined || next === undefined) {
+            continue;
+        }
+
+        const gap = next - current;
+
+        // Use > rather than >= so that, in the case of
+        // equally large gaps, the wrapping gap wins.
         if (gap > largestGap) {
             largestGap = gap;
             largestGapIndex = i;
         }
     }
 
+    // The bounds are everything outside the largest empty gap.
     const westIndex = (largestGapIndex + 1) % longitudes.length;
     const eastIndex = largestGapIndex;
+
+    const west = longitudes[westIndex];
+    const east = longitudes[eastIndex];
+
+    if (west === undefined || east === undefined) {
+        throw new Error("At least one coordinate is required");
+    }
 
     return {
         north,
         south,
-        east: longitudes[eastIndex],
-        west: longitudes[westIndex],
+        east,
+        west,
     };
 }
