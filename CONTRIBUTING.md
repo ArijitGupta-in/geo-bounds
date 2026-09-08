@@ -40,6 +40,7 @@ Run `npm test` and `npm run check` before opening a pull request. Both must pass
 | --- | --- |
 | `src/types.ts` | All exported types and interfaces |
 | `src/coordinate.ts` | Coordinate validation and DMS conversion logic |
+| `src/getBounds.ts` | Bounding-box calculation |
 | `src/index.ts` | Public API barrel |
 
 ### No runtime dependencies
@@ -48,7 +49,7 @@ This library intentionally has zero runtime dependencies. Do not add any.
 
 ### Validation
 
-- Validate all inputs at the public boundary. Throw `RangeError` for out-of-range numeric values and `TypeError` for unsupported string values (e.g. unknown units). Include the bad value in the error message.
+- Validate all inputs at the public boundary. Throw `Error` when `getBounds` receives no coordinates and `RangeError` for invalid decimal or DMS coordinate values.
 - Do not validate internal data that has already been validated at the boundary.
 
 ### Tests
@@ -72,7 +73,7 @@ chore: bump vitest to 5.x
 
 ### Changelog
 
-Update `CHANGELOG.md` for every user-visible change. Add entries under `[Unreleased]`. Use the categories defined by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/): **Added**, **Changed**, **Deprecated**, **Removed**, **Fixed**, **Security**.
+Update `CHANGELOG.md` for every user-visible change. Add entries under the `[Unreleased]` section above the latest release. Use the categories defined by [Keep a Changelog](https://keepachangelog.com/en/1.1.0/): **Added**, **Changed**, **Deprecated**, **Removed**, **Fixed**, **Security**.
 
 Internal-only changes (refactoring, test additions, build tooling) may be noted under **Internal** but do not require a changelog entry.
 
