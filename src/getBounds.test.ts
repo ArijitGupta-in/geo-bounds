@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getBounds } from "./getBounds";
 
 describe("getBounds", () => {
     it("returns bounds for a single coordinate", () => {
