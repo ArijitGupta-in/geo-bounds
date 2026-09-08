@@ -8,12 +8,19 @@ function isDMSCoordinate(
 }
 
 function normalize(coord: Coordinate | DMSCoordinate): Coordinate {
+    let normalized: Coordinate;
+
     if (isDMSCoordinate(coord)) {
-        return dmsToDecimal(coord);
+        normalized = dmsToDecimal(coord);
+    } else {
+        validateCoordinate(coord);
+        normalized = coord;
     }
 
-    validateCoordinate(coord);
-    return coord;
+    return {
+        latitude: normalized.latitude,
+        longitude: normalized.longitude === -180 ? 180 : normalized.longitude,
+    };
 }
 
 /**

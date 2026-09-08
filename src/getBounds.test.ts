@@ -120,4 +120,107 @@ describe("getBounds", () => {
             west: 0,
         });
     });
+
+    it("handles 180° and -180° as the same meridian", () => {
+        const coordinates = [
+            { latitude: 0, longitude: 180 },
+            { latitude: 0, longitude: -180 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 0,
+            south: 0,
+            east: 180,
+            west: 180,
+        });
+    });
+
+    it("handles multiple coordinates containing both 180° and -180°", () => {
+        const coordinates = [
+            { latitude: 10, longitude: 180 },
+            { latitude: 20, longitude: -180 },
+            { latitude: 15, longitude: 179 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 20,
+            south: 10,
+            east: 180,
+            west: 179,
+        });
+    });
+
+    it("uses a deterministic non-wrapping bound for points exactly 180° apart", () => {
+        const coordinates = [
+            { latitude: 0, longitude: 0 },
+            { latitude: 0, longitude: 180 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 0,
+            south: 0,
+            east: 180,
+            west: 0,
+        });
+    });
+
+    it("handles duplicate coordinates", () => {
+        const coordinates = [
+            { latitude: 10, longitude: 20 },
+            { latitude: 10, longitude: 20 },
+            { latitude: 10, longitude: 20 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 10,
+            south: 10,
+            east: 20,
+            west: 20,
+        });
+    });
+
+    it("handles coordinates with the same longitude", () => {
+        const coordinates = [
+            { latitude: 10, longitude: 50 },
+            { latitude: 20, longitude: 50 },
+            { latitude: -5, longitude: 50 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 20,
+            south: -5,
+            east: 50,
+            west: 50,
+        });
+    });
+
+    it("handles multiple coordinates crossing the antimeridian", () => {
+        const coordinates = [
+            { latitude: 10, longitude: 175 },
+            { latitude: 20, longitude: 179 },
+            { latitude: 15, longitude: -179 },
+            { latitude: 5, longitude: -175 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 20,
+            south: 5,
+            east: -175,
+            west: 175,
+        });
+    });
+
+    it("handles a normal longitude span of exactly 180°", () => {
+        const coordinates = [
+            { latitude: 10, longitude: -90 },
+            { latitude: 20, longitude: 90 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 20,
+            south: 10,
+            east: 90,
+            west: -90,
+        });
+    });
 });
