@@ -4,8 +4,8 @@ Thank you for your interest in contributing. This document covers everything you
 
 ## Prerequisites
 
-- **Node.js** 18 or later
-- **npm** 9 or later
+- **Node.js** 22.12 or later (development tooling only; the published package has no Node.js version requirement)
+- **npm** 10 or later
 
 ## Setup
 
