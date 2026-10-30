@@ -1,4 +1,4 @@
-import { normalizeCoordinate } from "@arijitgupta/geo-core";
+import { DEGREES_PER_CIRCLE, normalizeCoordinate } from "@arijitgupta/geo-core";
 import type { Bounds, Coordinate, DMSCoordinate } from "./types.js";
 
 /**
@@ -15,49 +15,31 @@ export function getBounds(coordinates: (Coordinate | DMSCoordinate)[]): Bounds {
         throw new Error("At least one coordinate is required");
     }
 
-    const normalized = coordinates.map(normalizeCoordinate);
-
-    const firstCoordinate = normalized[0];
-
-    if (firstCoordinate === undefined) {
-        throw new Error("At least one coordinate is required");
-    }
-
-    let south = firstCoordinate.latitude;
-    let north = firstCoordinate.latitude;
-
+    let south = Infinity;
+    let north = -Infinity;
     const longitudes: number[] = [];
 
-    for (const coordinate of normalized) {
-        south = Math.min(south, coordinate.latitude);
-        north = Math.max(north, coordinate.latitude);
-        longitudes.push(coordinate.longitude);
+    for (const input of coordinates) {
+        const { latitude, longitude } = normalizeCoordinate(input);
+        south = Math.min(south, latitude);
+        north = Math.max(north, latitude);
+        longitudes.push(longitude);
     }
 
     longitudes.sort((a, b) => a - b);
 
-    const firstLongitude = longitudes[0];
-    const lastLongitude = longitudes[longitudes.length - 1];
-
-    if (firstLongitude === undefined || lastLongitude === undefined) {
-        throw new Error("At least one coordinate is required");
-    }
+    // The array is non-empty, so every index read below is defined.
+    const count = longitudes.length;
 
     // Start with the gap that wraps from the largest longitude
     // back around to the smallest longitude.
-    let largestGap = firstLongitude + 360 - lastLongitude;
-    let largestGapIndex = longitudes.length - 1;
+    let largestGap =
+        longitudes[0]! + DEGREES_PER_CIRCLE - longitudes[count - 1]!;
+    let largestGapIndex = count - 1;
 
     // Find the largest gap between adjacent longitudes.
-    for (let i = 0; i < longitudes.length - 1; i++) {
-        const current = longitudes[i];
-        const next = longitudes[i + 1];
-
-        if (current === undefined || next === undefined) {
-            continue;
-        }
-
-        const gap = next - current;
+    for (let i = 0; i < count - 1; i++) {
+        const gap = longitudes[i + 1]! - longitudes[i]!;
 
         // Use > rather than >= so that, in the case of
         // equally large gaps, the wrapping gap wins.
@@ -68,20 +50,10 @@ export function getBounds(coordinates: (Coordinate | DMSCoordinate)[]): Bounds {
     }
 
     // The bounds are everything outside the largest empty gap.
-    const westIndex = (largestGapIndex + 1) % longitudes.length;
-    const eastIndex = largestGapIndex;
-
-    const west = longitudes[westIndex];
-    const east = longitudes[eastIndex];
-
-    if (west === undefined || east === undefined) {
-        throw new Error("At least one coordinate is required");
-    }
-
     return {
         north,
         south,
-        east,
-        west,
+        east: longitudes[largestGapIndex]!,
+        west: longitudes[(largestGapIndex + 1) % count]!,
     };
 }

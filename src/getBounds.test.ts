@@ -101,6 +101,87 @@ describe("getBounds", () => {
         });
     });
 
+    it("returns a zero-width box for duplicate coordinates", () => {
+        const point = { latitude: 5, longitude: 40 };
+
+        expect(getBounds([point, point, { ...point }])).toEqual({
+            north: 5,
+            south: 5,
+            east: 40,
+            west: 40,
+        });
+    });
+
+    it("handles duplicate longitudes alongside other longitudes", () => {
+        const coordinates = [
+            { latitude: 0, longitude: 10 },
+            { latitude: 1, longitude: 10 },
+            { latitude: 2, longitude: 30 },
+            { latitude: 3, longitude: 30 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 3,
+            south: 0,
+            east: 30,
+            west: 10,
+        });
+    });
+
+    it("treats longitude -180 as the canonical 180", () => {
+        expect(getBounds([{ latitude: 0, longitude: -180 }])).toEqual({
+            north: 0,
+            south: 0,
+            east: 180,
+            west: 180,
+        });
+    });
+
+    it("keeps -180 and 180 together as one meridian", () => {
+        const coordinates = [
+            { latitude: 0, longitude: -180 },
+            { latitude: 10, longitude: 180 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 10,
+            south: 0,
+            east: 180,
+            west: 180,
+        });
+    });
+
+    it("crosses the antimeridian when a coordinate sits on 180", () => {
+        const coordinates = [
+            { latitude: 0, longitude: 170 },
+            { latitude: 0, longitude: 180 },
+            { latitude: 0, longitude: -170 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 0,
+            south: 0,
+            east: -170,
+            west: 170,
+        });
+    });
+
+    it("prefers the wrapping gap when gaps are equal", () => {
+        const coordinates = [
+            { latitude: 0, longitude: -90 },
+            { latitude: 0, longitude: 0 },
+            { latitude: 0, longitude: 90 },
+            { latitude: 0, longitude: 180 },
+        ];
+
+        expect(getBounds(coordinates)).toEqual({
+            north: 0,
+            south: 0,
+            east: 180,
+            west: -90,
+        });
+    });
+
     it("throws when given no coordinates", () => {
         expect(() => getBounds([])).toThrow(
             "At least one coordinate is required"
