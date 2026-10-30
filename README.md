@@ -194,10 +194,12 @@ for coordinate types, conversion, normalization, and validation. When upgrading:
 ## Development
 
 ```bash
-npm install       # install dev dependencies
-npm test          # run tests with Vitest
-npm run check     # type-check without emitting output
-npm run build     # compile TypeScript to dist/
+npm install            # install dev dependencies
+npm test               # run tests with Vitest
+npm run test:coverage  # run tests and enforce the 80% coverage threshold
+npm run check          # type-check source and tests without emitting output
+npm run lint:md        # lint Markdown files
+npm run build          # compile TypeScript to dist/
 ```
 
 ## License
