@@ -1,6 +1,6 @@
 {
     "name": "@arijitgupta/geo-bounds",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Calculate the smallest geographic bounding box for coordinates with decimal-degree, DMS, and antimeridian support.",
     "type": "module",
     "repository": {
