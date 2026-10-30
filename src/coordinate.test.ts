@@ -61,22 +61,22 @@ describe("validateCoordinate", () => {
         ).toThrow(RangeError);
     });
 
-    it("throws RangeError for non-finite latitude", () => {
+    it("throws TypeError for non-finite latitude", () => {
         expect(() =>
             validateCoordinate({ latitude: Infinity, longitude: 0 })
-        ).toThrow(RangeError);
+        ).toThrow(TypeError);
         expect(() =>
             validateCoordinate({ latitude: NaN, longitude: 0 })
-        ).toThrow(RangeError);
+        ).toThrow(TypeError);
     });
 
-    it("throws RangeError for non-finite longitude", () => {
+    it("throws TypeError for non-finite longitude", () => {
         expect(() =>
             validateCoordinate({ latitude: 0, longitude: Infinity })
-        ).toThrow(RangeError);
+        ).toThrow(TypeError);
         expect(() =>
             validateCoordinate({ latitude: 0, longitude: NaN })
-        ).toThrow(RangeError);
+        ).toThrow(TypeError);
     });
 });
 
@@ -114,7 +114,7 @@ describe("latitudeDMSToDecimal", () => {
         ).toBe(0);
     });
 
-    it("returns 0 for zero values with S direction", () => {
+    it("normalizes zero values with S direction to positive zero", () => {
         expect(
             latitudeDMSToDecimal({
                 degrees: 0,
@@ -122,7 +122,7 @@ describe("latitudeDMSToDecimal", () => {
                 seconds: 0,
                 direction: "S",
             })
-        ).toBe(-0);
+        ).toBe(0);
     });
 
     it("accepts the boundary value 90°N", () => {
@@ -222,6 +222,33 @@ describe("latitudeDMSToDecimal", () => {
                 direction: "N",
             })
         ).toThrow(RangeError);
+    });
+
+    it("requires integer degrees and minutes and valid directions", () => {
+        expect(() =>
+            latitudeDMSToDecimal({
+                degrees: 1.5,
+                minutes: 0,
+                seconds: 0,
+                direction: "N",
+            })
+        ).toThrow(RangeError);
+        expect(() =>
+            latitudeDMSToDecimal({
+                degrees: 1,
+                minutes: 0.5,
+                seconds: 0,
+                direction: "N",
+            })
+        ).toThrow(RangeError);
+        expect(() =>
+            latitudeDMSToDecimal({
+                degrees: 1,
+                minutes: 0,
+                seconds: 0,
+                direction: "X" as never,
+            })
+        ).toThrow(TypeError);
     });
 });
 

@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@arijitgupta/geo-bounds)](https://www.npmjs.com/package/@arijitgupta/geo-bounds)
 [![license](https://img.shields.io/npm/l/@arijitgupta/geo-bounds)](https://opensource.org/licenses/MIT)
 
-A lightweight, dependency-free TypeScript utility for calculating the smallest geographic bounding box containing a set of coordinates.
+A lightweight TypeScript utility for calculating the smallest geographic bounding box containing a set of coordinates. Shared coordinate types, conversion, and validation are provided by [`@arijitgupta/geo-core`](https://www.npmjs.com/package/@arijitgupta/geo-core).
 
 Accepts coordinates in **decimal degrees** or **Degrees, Minutes, Seconds (DMS)** format. Longitude is treated as a circular value, so bounds can cross the antimeridian.
 
@@ -100,7 +100,10 @@ Returns the smallest geographic bounding box containing all supplied coordinates
 
 **Throws:** `Error` if the array is empty.
 
-**Throws:** `RangeError` if a decimal coordinate or DMS component is invalid.
+**Throws:** `RangeError` if a coordinate is out of range or DMS degrees/minutes
+are not integers.
+**Throws:** `TypeError` if coordinate fields or DMS directions have invalid types,
+or if a decimal coordinate value is not finite.
 
 The longitude calculation treats `-180` and `180` as the same meridian. For a box that crosses the antimeridian, `west` is greater than `east`.
 
@@ -108,13 +111,17 @@ The longitude calculation treats `-180` and `180` as the same meridian. For a bo
 
 Converts a `DMSCoordinate` to a decimal-degree `Coordinate`.
 
-**Throws:** `RangeError` if any DMS component is out of range.
+**Throws:** `RangeError` if any DMS component is out of range or degrees/minutes
+are not integers.
+**Throws:** `TypeError` if a DMS component has an invalid type or direction.
 
 ### `validateCoordinate(coordinate)`
 
 Validates a decimal-degree `Coordinate`.
 
-**Throws:** `RangeError` if latitude is outside `[-90, 90]`, longitude is outside `[-180, 180]`, or either value is not finite.
+**Throws:** `RangeError` if latitude is outside `[-90, 90]` or longitude is outside
+`[-180, 180]`.
+**Throws:** `TypeError` if coordinate fields are invalid or either value is not finite.
 
 ### `Coordinate`
 
@@ -151,6 +158,7 @@ interface LongitudeDMS {
 **Validation rules:**
 
 - `minutes` must be in `[0, 60)`.
+- `degrees` and `minutes` must be integers.
 - `seconds` must be in `[0, 60)`.
 - `latitude.degrees` must be in `[0, 90]`; the combined value must not exceed 90 degrees.
 - `longitude.degrees` must be in `[0, 180]`; the combined value must not exceed 180 degrees.
@@ -166,13 +174,22 @@ type Bounds = {
 };
 ```
 
+## Upgrading from 1.x
+
+Version 2.0.0 uses [`@arijitgupta/geo-core`](https://www.npmjs.com/package/@arijitgupta/geo-core)
+for coordinate types, conversion, normalization, and validation. When upgrading:
+
+- DMS degrees and minutes must be integers; fractional seconds remain supported.
+- Invalid DMS directions and non-finite decimal coordinate values throw `TypeError`.
+- Converting a south/west DMS coordinate whose magnitude is zero now returns positive zero.
+
 ## Behavior
 
 - Uses the minimum and maximum latitude values for `south` and `north`.
 - Finds the largest empty gap between longitudes and returns everything outside that gap as the smallest longitude interval.
 - Supports bounds that cross the antimeridian.
 - Uses a deterministic non-wrapping result when multiple longitude intervals are equally small.
-- Has no runtime dependencies.
+- Uses `@arijitgupta/geo-core` for shared geographic utilities.
 
 ## Development
 

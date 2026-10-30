@@ -7,7 +7,20 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
-## [Unreleased]
+## [2.0.0] - 2026-10-30
+
+### Breaking changes
+
+- DMS degrees and minutes must be integers; values with fractional degrees or
+  minutes that were accepted by 1.x are rejected. Fractional seconds remain valid.
+- Invalid DMS directions now throw `TypeError`.
+- Non-finite decimal coordinate values now throw `TypeError` instead of `RangeError`.
+- DMS values representing zero now convert to positive zero, including south/west zero.
+
+### Changed
+
+- Use `@arijitgupta/geo-core` v1.0.0 for shared coordinate types, conversion,
+  normalization, and validation.
 
 ---
 
@@ -25,3 +38,4 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - `prepublishOnly` script to type-check, test, and build before publishing.
 
 [1.0.0]: https://github.com/ArijitGupta-in/geo-bounds/releases/tag/v1.0.0
+[2.0.0]: https://github.com/ArijitGupta-in/geo-bounds/releases/tag/v2.0.0

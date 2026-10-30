@@ -107,6 +107,27 @@ describe("getBounds", () => {
         );
     });
 
+    it("rejects fractional DMS degrees using shared validation", () => {
+        expect(() =>
+            getBounds([
+                {
+                    latitude: {
+                        degrees: 1.5,
+                        minutes: 0,
+                        seconds: 0,
+                        direction: "N",
+                    },
+                    longitude: {
+                        degrees: 0,
+                        minutes: 0,
+                        seconds: 0,
+                        direction: "E",
+                    },
+                },
+            ])
+        ).toThrow(RangeError);
+    });
+
     it("uses a non-wrapping bound when longitude span is exactly 180 degrees", () => {
         const coordinates = [
             { latitude: 0, longitude: 0 },

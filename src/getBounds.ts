@@ -1,27 +1,5 @@
-import type { Coordinate, Bounds, DMSCoordinate } from "./types.js";
-import { validateCoordinate, dmsToDecimal } from "./coordinate.js";
-
-function isDMSCoordinate(
-    coord: Coordinate | DMSCoordinate
-): coord is DMSCoordinate {
-    return typeof coord.latitude === "object";
-}
-
-function normalize(coord: Coordinate | DMSCoordinate): Coordinate {
-    let normalized: Coordinate;
-
-    if (isDMSCoordinate(coord)) {
-        normalized = dmsToDecimal(coord);
-    } else {
-        validateCoordinate(coord);
-        normalized = coord;
-    }
-
-    return {
-        latitude: normalized.latitude,
-        longitude: normalized.longitude === -180 ? 180 : normalized.longitude,
-    };
-}
+import { normalizeCoordinate } from "@arijitgupta/geo-core";
+import type { Bounds, Coordinate, DMSCoordinate } from "./types.js";
 
 /**
  * Calculates the smallest geographic bounding box containing all coordinates.
@@ -37,7 +15,7 @@ export function getBounds(coordinates: (Coordinate | DMSCoordinate)[]): Bounds {
         throw new Error("At least one coordinate is required");
     }
 
-    const normalized = coordinates.map(normalize);
+    const normalized = coordinates.map(normalizeCoordinate);
 
     const firstCoordinate = normalized[0];
 
